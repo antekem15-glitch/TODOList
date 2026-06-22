@@ -1,0 +1,41 @@
+{
+  "devDependencies": {
+    "css-loader": "^7.1.4",
+    "html-loader": "^5.1.0",
+    "html-webpack-plugin": "^5.6.7",
+    "style-loader": "^4.0.0",
+    "webpack": "^5.107.2",
+    "webpack-cli": "^7.0.3",
+    "webpack-dev-server": "^5.2.5",
+    "webpack-merge": "^6.0.1"
+  },
+  "name": "todolist",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "clone-deep": "^4.0.1",
+    "flat": "^5.0.2",
+    "is-plain-object": "^2.0.4",
+    "isobject": "^3.0.1",
+    "kind-of": "^6.0.3",
+    "shallow-clone": "^3.0.1",
+    "wildcard": "^2.0.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/antekem15-glitch/TODOList.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/antekem15-glitch/TODOList/issues"
+  },
+  "homepage": "https://github.com/antekem15-glitch/TODOList#readme"
+}
+
