@@ -1,4 +1,4 @@
-/* Reset und Basis-Styling */
+
 * {
     margin: 0;
     padding: 0;
@@ -20,7 +20,7 @@ body {
     margin: auto;
 }
 
-/* Header - Überschrift */
+
 .containerHeader {
     grid-area: header;
     background: linear-gradient(135deg, #f5f5dc 0%, #d8da92 100%);
@@ -78,7 +78,7 @@ body {
     letter-spacing: 0.5px;
 }
 
-/* Dialog Styles (wie zuvor) */
+
 .dialog-overlay {
     position: fixed;
     top: 0;
@@ -94,7 +94,7 @@ body {
 }
 
 
-/* Navigation - Seitenleiste */
+
 .containerNav {
     grid-area: nav;
     background: #f5f5dc;
@@ -133,7 +133,7 @@ body {
     transform: translateX(2px);
 }
 
-/* Aktiver Zustand für Navigation */
+
 .navItem.active {
     background: #8a9a5a;
     color: white;
@@ -147,7 +147,7 @@ body {
     font-size: 0.8rem;
 }
 
-/* Main Content - Cards Bereich */
+
 .containerMain {
     grid-area: main;
     background: #f7fafc;
@@ -354,7 +354,7 @@ body {
 }
 
 
-/* Responsive Anpassungen */
+
 @media (max-width: 1024px) {
     body {
         grid-template-columns: 1fr 4fr;
@@ -435,4 +435,32 @@ body {
     .containerMain {
         padding: 15px;
     }
+}
+
+.card {
+    position: relative;  /* Wichtig für die Positionierung des Lösch-Buttons */
+}
+
+.card-delete {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #a0aec0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.card-delete:hover {
+    color: #fc8181;
+    background: #fff5f5;
+    transform: scale(1.1);
 }

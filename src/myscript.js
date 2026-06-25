@@ -1,70 +1,115 @@
 import "./style.css";
 import PlusIcon from "../img/Plus.svg";
 
-
 class Page {
-
-
- constructor() {
-        this.tasks = [];      
-        this.nextId = 1;      
+    constructor() {
+        this.tasks = [];
+        this.nextId = 1;
+        this.currentView = "today";
+        this.loadFromStorage();
     }
 
-createPage(){
-
-this.header = this.createHeader();
-this.navigator = this.createNavigator();
-this.main = this.createMain();
-
-
+    createPage() {
+        this.header = this.createHeader();
+        this.navigator = this.createNavigator();
+        this.main = this.createMain();
+        
+        this.setActiveNav("today");
+        
+        this.updateCards();
+    }
+    saveToStorage() {
+    try {
+        const data = {
+            tasks: this.tasks,
+            nextId: this.nextId
+        };
+        localStorage.setItem('todoListData', JSON.stringify(data));
+    } catch (error) {
+        console.error('Fehler beim Speichern:', error);
+    }
 }
 
-createHeader() {
-this.containerHeader = document.createElement("div");
-this.containerHeader.className = "containerHeader";
-this.titleHeader = document.createElement("h1");
-this.titleHeader.className = "titleHeader";
-this.titleHeader.textContent = "My To-Do-List";
-
-this.containerHeader.append(this.titleHeader);
-
-return this.containerHeader;
+loadFromStorage() {
+    try {
+        const savedData = localStorage.getItem('todoListData');
+        if (savedData) {
+            const data = JSON.parse(savedData);
+            this.tasks = data.tasks || [];
+            this.nextId = data.nextId || 1;
+            
+            
+            this.tasks = this.tasks.map(task => ({
+                ...task,
+                dueDate: new Date(task.dueDate)
+            }));
+        }
+    } catch (error) {
+        console.error('Fehler beim Laden:', error);
+        this.tasks = [];
+        this.nextId = 1;
+    }
 }
-createNavigator() {
-    this.containerNav = document.createElement("nav");
-    this.containerNav.className = "containerNav";
-    this.navList = document.createElement("ul");
-    this.navList.className = "navList";
-    
-    
-    this.navItemToday = document.createElement("li");
-    this.navItemToday.className = "navItem";
-    this.navItemToday.textContent = "Today";
-    
-    
-    this.navItemWeek = document.createElement("li");
-    this.navItemWeek.className = "navItem";
-    this.navItemWeek.textContent = "Week";
-    
-    this.navItemMonth = document.createElement("li");
-    this.navItemMonth.className = "navItem";
-    this.navItemMonth.textContent = "Month";
-    this.navList.append(this.navItemToday, this.navItemWeek, this.navItemMonth);
-    
-    
-    this.containerNav.append(this.navList);
+deleteTask(id) {
+    this.tasks = this.tasks.filter(task => task.id !== id);
+    this.saveToStorage();  // ← HIER EINFÜGEN
+    this.updateCards();
+}
 
-    this.addButton = document.createElement("button");
+    createHeader() {
+        this.containerHeader = document.createElement("div");
+        this.containerHeader.className = "containerHeader";
+        this.titleHeader = document.createElement("h1");
+        this.titleHeader.className = "titleHeader";
+        this.titleHeader.textContent = "My To-Do-List";
+
+        this.containerHeader.append(this.titleHeader);
+
+        return this.containerHeader;
+    }
+
+    createNavigator() {
+        this.containerNav = document.createElement("nav");
+        this.containerNav.className = "containerNav";
+        this.navList = document.createElement("ul");
+        this.navList.className = "navList";
+
+        this.navItemToday = document.createElement("li");
+        this.navItemToday.className = "navItem";
+        this.navItemToday.textContent = "Today";
+        this.navItemToday.dataset.view = "today";
+        this.navItemToday.addEventListener("click", () => {
+            this.switchView("today");
+        });
+
+        this.navItemWeek = document.createElement("li");
+        this.navItemWeek.className = "navItem";
+        this.navItemWeek.textContent = "Week";
+        this.navItemWeek.dataset.view = "week";
+        this.navItemWeek.addEventListener("click", () => {
+            this.switchView("week");
+        });
+
+        this.navItemMonth = document.createElement("li");
+        this.navItemMonth.className = "navItem";
+        this.navItemMonth.textContent = "Month";
+        this.navItemMonth.dataset.view = "month";
+        this.navItemMonth.addEventListener("click", () => {
+            this.switchView("month");
+        });
+
+        this.navList.append(this.navItemToday, this.navItemWeek, this.navItemMonth);
+        this.containerNav.append(this.navList);
+
+        this.addButton = document.createElement("button");
         this.addButton.className = "addButton";
 
-        // Plus-Symbol als Bild
         const plusImg = document.createElement("img");
         plusImg.src = PlusIcon;
         plusImg.alt = "Add Task";
         plusImg.className = "plusIcon";
         this.addButton.append(plusImg);
 
-        // Add Task Text
         const addText = document.createElement("span");
         addText.className = "addText";
         addText.textContent = "Add Task";
@@ -76,45 +121,53 @@ createNavigator() {
 
         this.containerNav.append(this.addButton);
 
-    return this.containerNav;
-  }
+        return this.containerNav;
+    }
 
-  createMain() {
-    this.containerMain = document.createElement("main");
-    this.containerMain.className = "containerMain";
-    this.cards = this.createCards();
-    this.containerMain.append(this.cards);
-    // Füge hier deine Hauptinhalte hinzu
-    return this.containerMain;
-  }
+    setActiveNav(view) {
+        document.querySelectorAll('.navItem').forEach(item => {
+            item.classList.remove('active');
+        });
+        const activeItem = document.querySelector(`.navItem[data-view="${view}"]`);
+        if (activeItem) {
+            activeItem.classList.add('active');
+        }
+    }
 
-  createCards() {
-    this.containerCards = document.createElement("div");
-    this.containerCards.className = "containerCards";
-    this.containerCards.textContent = "Your cards will appear here";
-    // Füge hier deine Card-Elemente hinzu
-    return this.containerCards;
-  }
+    switchView(view) {
+        this.currentView = view;
+        this.setActiveNav(view);
+        this.updateCards();
+    }
 
-showAddTaskDialog() {
-        
+    createMain() {
+        this.containerMain = document.createElement("main");
+        this.containerMain.className = "containerMain";
+        this.cards = this.createCards();
+        this.containerMain.append(this.cards);
+        return this.containerMain;
+    }
+
+    createCards() {
+        this.containerCards = document.createElement("div");
+        this.containerCards.className = "containerCards";
+        return this.containerCards;
+    }
+
+    showAddTaskDialog() {
         const overlay = document.createElement("div");
         overlay.className = "dialog-overlay";
 
-        
         const dialog = document.createElement("div");
         dialog.className = "dialog";
 
-       
         const dialogTitle = document.createElement("h2");
         dialogTitle.className = "dialog-title";
         dialogTitle.textContent = "Add new Tasks";
 
-        
         const form = document.createElement("form");
         form.className = "dialog-form";
 
-        
         const titleLabel = document.createElement("label");
         titleLabel.textContent = "Title *";
         const titleInput = document.createElement("input");
@@ -123,7 +176,6 @@ showAddTaskDialog() {
         titleInput.className = "dialog-input";
         titleInput.required = true;
 
-        // Beschreibung Eingabe
         const descLabel = document.createElement("label");
         descLabel.textContent = "Description";
         const descInput = document.createElement("textarea");
@@ -131,7 +183,6 @@ showAddTaskDialog() {
         descInput.className = "dialog-textarea";
         descInput.rows = 3;
 
-   
         const dateLabel = document.createElement("label");
         dateLabel.textContent = "Due Date *";
         const dateInput = document.createElement("input");
@@ -139,19 +190,17 @@ showAddTaskDialog() {
         dateInput.className = "dialog-input";
         dateInput.required = true;
 
-     
         const today = new Date();
         const year = today.getFullYear();
         const month = String(today.getMonth() + 1).padStart(2, '0');
         const day = String(today.getDate()).padStart(2, '0');
         dateInput.value = `${year}-${month}-${day}`;
 
-        
         const priorityLabel = document.createElement("label");
         priorityLabel.textContent = "Priority";
         const prioritySelect = document.createElement("select");
         prioritySelect.className = "dialog-select";
-        
+
         const priorities = ["Low", "Medium", "High"];
         priorities.forEach(p => {
             const option = document.createElement("option");
@@ -168,7 +217,6 @@ showAddTaskDialog() {
         noteInput.className = "dialog-textarea";
         noteInput.rows = 3;
 
-        // Buttons
         const buttonContainer = document.createElement("div");
         buttonContainer.className = "dialog-buttons";
 
@@ -196,11 +244,9 @@ showAddTaskDialog() {
             buttonContainer
         );
 
-        
         dialog.append(dialogTitle, form);
         overlay.append(dialog);
 
-        // Event-Listener für Formular-Submit
         form.addEventListener("submit", (e) => {
             e.preventDefault();
 
@@ -220,7 +266,6 @@ showAddTaskDialog() {
                 return;
             }
 
-            // Erstelle neue Aufgabe
             const newTask = {
                 id: this.nextId++,
                 title: title,
@@ -231,12 +276,12 @@ showAddTaskDialog() {
             };
 
             this.tasks.push(newTask);
+            this.saveToStorage();
             this.updateCards();
 
-            // Schließe Dialog
             document.body.removeChild(overlay);
         });
-        
+
         overlay.addEventListener("click", (e) => {
             if (e.target === overlay) {
                 document.body.removeChild(overlay);
@@ -244,90 +289,246 @@ showAddTaskDialog() {
         });
 
         document.body.append(overlay);
-
-      
         setTimeout(() => titleInput.focus(), 100);
     }
 
     updateCards() {
-        // Leere die Cards
         this.containerCards.innerHTML = '';
 
-        if (this.tasks.length === 0) {
-            this.containerCards.textContent = "Your cards will appear here";
+        
+        let filteredTasks = [];
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        switch (this.currentView) {
+            case "today":
+                filteredTasks = this.tasks.filter(task => {
+                    const taskDate = new Date(task.dueDate);
+                    taskDate.setHours(0, 0, 0, 0);
+                    return taskDate.getTime() === today.getTime();
+                });
+                this.renderCards(filteredTasks, "Today's Tasks");
+                break;
+
+            case "week":
+              
+                const weekStart = new Date(today);
+                const dayOfWeek = today.getDay(); 
+                const diffToMonday = (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
+                weekStart.setDate(today.getDate() - diffToMonday);
+                weekStart.setHours(0, 0, 0, 0);
+
+                
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekStart.getDate() + 6);
+                weekEnd.setHours(23, 59, 59, 999);
+
+                filteredTasks = this.tasks.filter(task => {
+                    const taskDate = new Date(task.dueDate);
+                    taskDate.setHours(0, 0, 0, 0);
+                    return taskDate >= weekStart && taskDate <= weekEnd;
+                });
+
+               
+                filteredTasks.sort((a, b) => {
+                    return new Date(a.dueDate) - new Date(b.dueDate);
+                });
+
+                this.renderWeekCards(filteredTasks, weekStart, weekEnd);
+                break;
+
+            case "month":
+                const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+                const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                monthEnd.setHours(23, 59, 59, 999);
+
+                filteredTasks = this.tasks.filter(task => {
+                    const taskDate = new Date(task.dueDate);
+                    taskDate.setHours(0, 0, 0, 0);
+                    return taskDate >= monthStart && taskDate <= monthEnd;
+                });
+
+                
+                filteredTasks.sort((a, b) => {
+                    return new Date(a.dueDate) - new Date(b.dueDate);
+                });
+
+                this.renderCards(filteredTasks, `Month: ${today.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })}`);
+                break;
+
+            default:
+                filteredTasks = this.tasks;
+                this.renderCards(filteredTasks, "All Tasks");
+        }
+    }
+
+    renderCards(tasks, title) {
+        if (tasks.length === 0) {
+            const emptyMessage = document.createElement("div");
+            emptyMessage.className = "empty-message";
+            emptyMessage.innerHTML = `
+                <h3>No Tasks</h3>
+                <p>No tasks for "${title}"</p>
+                <p style="font-size: 0.9rem; margin-top: 10px; color: #a0aec0;">
+                    Click "Add Task" to create a new one.
+                </p>
+            `;
+            this.containerCards.append(emptyMessage);
+            return;
+        }
+
+        const categoryTitle = document.createElement("div");
+        categoryTitle.className = "category-title";
+        categoryTitle.innerHTML = `<h2>${title}</h2><span>${tasks.length} Task(s)</span>`;
+        this.containerCards.append(categoryTitle);
+
+        tasks.forEach(task => {
+            this.createCardElement(task);
+        });
+    }
+
+    renderWeekCards(tasks, weekStart, weekEnd) {
+        if (tasks.length === 0) {
+            const emptyMessage = document.createElement("div");
+            emptyMessage.className = "empty-message";
+            emptyMessage.innerHTML = `
+                <h3>No Tasks</h3>
+                <p>No tasks for this week</p>
+                <p style="font-size: 0.9rem; margin-top: 10px; color: #a0aec0;">
+                    Click "Add Task" to create a new one.
+                </p>
+            `;
+            this.containerCards.append(emptyMessage);
             return;
         }
 
         
-        this.tasks.forEach(task => {
-            const card = document.createElement("div");
-            card.className = "card";
+        const weekTitle = document.createElement("div");
+        weekTitle.className = "category-title";
+        const weekDateStr = `${weekStart.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })} - ${weekEnd.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
+        weekTitle.innerHTML = `<h2>Week ${weekDateStr}</h2><span>${tasks.length} Task(s)</span>`;
+        this.containerCards.append(weekTitle);
 
-            // Prioritäts-Farbe
-            const priorityColors = {
-                "Niedrig": "#48bb78",
-                "Mittel": "#ed8936",
-                "Hoch": "#f30707"
-            };
-            card.style.borderColor = priorityColors[task.priority] || "#8a9a5a";
+        
+        const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        const tasksByDay = {};
 
+        weekdays.forEach(day => {
+            tasksByDay[day] = [];
+        });
+
+        tasks.forEach(task => {
+            const taskDate = new Date(task.dueDate);
+            const dayIndex = taskDate.getDay(); 
+            const dayName = weekdays[(dayIndex === 0) ? 6 : dayIndex - 1];
+            tasksByDay[dayName].push(task);
+        });
+
+        
+        weekdays.forEach((day, index) => {
+            const dayTasks = tasksByDay[day];
             
-            const cardTitle = document.createElement("div");
-            cardTitle.className = "card-title";
-            cardTitle.textContent = task.title;
-
            
-            const cardDescription = document.createElement("div");
-            cardDescription.className = "card-description";
-            cardDescription.textContent = task.description;
-
-           
-            const cardDate = document.createElement("div");
-            cardDate.className = "card-date";
-            const dateOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
-            cardDate.textContent = `Due: ${task.dueDate.toLocaleDateString('de-DE', dateOptions)}`;
-
+            const currentDate = new Date(weekStart);
+            currentDate.setDate(weekStart.getDate() + index);
             
-            const cardPriority = document.createElement("div");
-            cardPriority.className = "card-priority";
-            const priorityEmojis = {
-                "Low": "🟢",
-                "Medium": "🟡",
-                "High": "🔴"
-            };
-            cardPriority.textContent = `Priority:${priorityEmojis[task.priority] || ''} ${task.priority}`;
-
+            const dayContainer = document.createElement("div");
+            dayContainer.className = "day-group";
             
-            const cardElements = [cardTitle, cardDescription, cardDate, cardPriority];
+            const dayHeader = document.createElement("div");
+            dayHeader.className = "day-header";
             
-            if (task.note) {
-                const cardNote = document.createElement("div");
-                cardNote.className = "card-note";
-                cardNote.textContent = `📝 ${task.note}`;
-                cardElements.push(cardNote);
+            
+            const dateStr = currentDate.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
+            const isToday = currentDate.toDateString() === new Date().toDateString();
+            dayHeader.innerHTML = `
+                <span class="day-name">${day} ${isToday ? '⭐' : ''}</span>
+                <span class="day-date">${dateStr}</span>
+                <span class="day-count">${dayTasks.length} Task(s)</span>
+            `;
+            
+            dayContainer.append(dayHeader);
+            
+            if (dayTasks.length === 0) {
+                const noTask = document.createElement("div");
+                noTask.className = "no-task";
+                noTask.textContent = "No tasks for this day";
+                dayContainer.append(noTask);
+            } else {
+                dayTasks.forEach(task => {
+                    this.createCardElement(task, dayContainer);
+                });
             }
-
-            card.append(...cardElements);
-            this.containerCards.append(card);
+            
+            this.containerCards.append(dayContainer);
         });
     }
 
+    createCardElement(task, container = this.containerCards) {
+        const card = document.createElement("div");
+        card.className = "card";
 
-render(){
-    this.containerPage=document.createElement("div");
-    this.containerPage.className= "pageContent";
+        const priorityColors = {
+            "Low": "#48bb78",
+            "Medium": "#ed8936",
+            "High": "#fc8181"
+        };
+        card.style.borderColor = priorityColors[task.priority] || "#8a9a5a";
 
-  
-    
-    
-    document.body.append(this.header, this.navigator, this.main, this.containerPage);
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "card-delete";
+        deleteBtn.textContent = "×";
+        deleteBtn.title = "Aufgabe löschen";
+        deleteBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (confirm(`Aufgabe "${task.title}" löschen?`)) {
+            this.deleteTask(task.id);
+    }
+});
 
+        const cardTitle = document.createElement("div");
+        cardTitle.className = "card-title";
+        cardTitle.textContent = task.title;
+
+        const cardDescription = document.createElement("div");
+        cardDescription.className = "card-description";
+        cardDescription.textContent = task.description;
+
+        const cardDate = document.createElement("div");
+        cardDate.className = "card-date";
+        const dateOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
+        cardDate.textContent = `Due: ${task.dueDate.toLocaleDateString('de-DE', dateOptions)}`;
+
+        const cardPriority = document.createElement("div");
+        cardPriority.className = "card-priority";
+        const priorityEmojis = {
+            "Low": "🟢",
+            "Medium": "🟡",
+            "High": "🔴"
+        };
+        cardPriority.textContent = `Priority: ${priorityEmojis[task.priority] || ''} ${task.priority}`;
+
+        const cardElements = [deleteBtn,cardTitle, cardDescription, cardDate, cardPriority];
+
+        if (task.note) {
+            const cardNote = document.createElement("div");
+            cardNote.className = "card-note";
+            cardNote.textContent = `${task.note}`;
+            cardElements.push(cardNote);
+        }
+
+        card.append(...cardElements);
+        container.append(card);
+    }
+
+    render() {
+        this.containerPage = document.createElement("div");
+        this.containerPage.className = "pageContent";
+
+        document.body.append(this.header, this.navigator, this.main, this.containerPage);
+    }
 }
 
-}
 const page = new Page();
 page.createPage();
 page.render();
-
-
-
