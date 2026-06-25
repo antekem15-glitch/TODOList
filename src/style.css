@@ -39,7 +39,59 @@ body {
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
    
 }
+.addButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 14px;
+    background: #96a864;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-top: 1rem;
+    box-shadow: 0 2px 10px rgba(138, 154, 90, 0.3);
+}
 
+.addButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(138, 154, 90, 0.4);
+    background: #46502a;
+}
+
+.addButton:active {
+    transform: translateY(0px);
+}
+
+.plusIcon {
+    width: 16px;
+    height: 16px;
+    filter: brightness(0) invert(1);
+}
+
+.addText {
+    letter-spacing: 0.5px;
+}
+
+/* Dialog Styles (wie zuvor) */
+.dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
 
 
 /* Navigation - Seitenleiste */
@@ -109,14 +161,15 @@ body {
     gap: 20px;
 }
 
-/* Styling für die Cards */
+
 .card {
     background: white;
-    padding: 20px;
+    padding: 30px;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     border-left: 4px solid #8a9a5a;
     transition: all 0.3s ease;
+    
 }
 
 .card:hover {
@@ -128,14 +181,16 @@ body {
     font-weight: 700;
     color: #2d3748;
     margin-bottom: 8px;
+    font-size: 1.5rem;
 }
 
 .card-description {
     color: #718096;
     font-size: 0.95rem;
+    margin-bottom: 0.5rem;
 }
 
-/* Platzhalter-Text in Cards */
+
 .containerCards:not(:has(.card)) {
     color: #a0aec0;
     font-size: 1.2rem;
@@ -151,7 +206,7 @@ body {
     grid-column: 1 / -1;
 }
 
-/* Scrollbar Styling */
+
 .containerMain::-webkit-scrollbar {
     width: 8px;
 }
@@ -169,6 +224,135 @@ body {
 .containerMain::-webkit-scrollbar-thumb:hover {
     background: #6b7a3e;
 }
+
+.dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.dialog {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideUp 0.3s ease;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.dialog-title {
+    color: #2d3748;
+    font-size: 1.8rem;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.dialog-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.dialog-form label {
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 0.95rem;
+}
+
+.dialog-input,
+.dialog-textarea,
+.dialog-select {
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: border-color 0.3s ease;
+    width: 100%;
+}
+
+.dialog-input:focus,
+.dialog-textarea:focus,
+.dialog-select:focus {
+    outline: none;
+    border-color: #8a9a5a;
+    box-shadow: 0 0 0 3px rgba(138, 154, 90, 0.1);
+}
+
+.dialog-textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+.dialog-select {
+    background: white;
+    cursor: pointer;
+}
+
+.dialog-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.dialog-button {
+    flex: 1;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.dialog-cancel {
+    background: #f7fafc;
+    color: #4a5568;
+}
+
+.dialog-cancel:hover {
+    background: #edf2f7;
+}
+
+.dialog-submit {
+    background: #8a9a5a;
+    color: white;
+}
+
+.dialog-submit:hover {
+    background: #7a8a4a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(138, 154, 90, 0.3);
+}
+
 
 /* Responsive Anpassungen */
 @media (max-width: 1024px) {
