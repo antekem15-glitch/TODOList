@@ -353,7 +353,7 @@ deleteTask(id) {
                     return new Date(a.dueDate) - new Date(b.dueDate);
                 });
 
-                this.renderCards(filteredTasks, `Month: ${today.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })}`);
+                this.renderCards(filteredTasks, `Month: ${today.toLocaleDateString('en-EN', { month: 'long', year: 'numeric' })}`);
                 break;
 
             default:
